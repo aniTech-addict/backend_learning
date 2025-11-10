@@ -1,0 +1,24 @@
+{
+  "name": "backend_learning",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "Kirti Anand",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@arcjet/inspect": "1.0.0-beta.14",
+    "@arcjet/node": "1.0.0-beta.14",
+    "dotenv": "^17.2.3",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.1",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.5.0"
+  }
+}
