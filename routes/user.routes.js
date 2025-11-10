@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-userRouter = Router();
+const userRouter = Router();
 
 userRouter.get('/', (req, res) => {
     res.send('get All user details');
