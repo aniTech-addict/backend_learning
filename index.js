@@ -5,6 +5,7 @@ import userRouter from './routes/user.routes.js';
 import subscriptionRouter from './routes/subscription.routes.js';
 import authRouter from './routes/auth.routes.js';
 import connectDb from './DB/connectDb.js';
+import authorizationMiddleware from './middleware/authorization.middleware.js';
 
 const app = express();
 
