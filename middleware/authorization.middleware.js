@@ -10,16 +10,19 @@ const authorizationMiddleware = async (req,res,next)=>{
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    token = jwt.decode(token, JWT_ACCESS_SECRET);
-    const user = await User.findById(token.userId);
+    try {
+        const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+        const user = await User.findById(decoded.userId);
 
-    if(!user){
-        const error = new Error('Unauthorized');
-        Error.status = 401;
-        return next(Error);
+        if(!user){
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        req.user = user;
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: 'Invalid token' });
     }
-
-    next();
 
 }
 

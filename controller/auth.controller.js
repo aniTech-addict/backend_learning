@@ -48,17 +48,17 @@ export const sign_in = async (req,res,next)=>{
     const { username, password } = req.body;
     try{
         if (!username || !password) {
-            return res.status(400).json({ message: 'Username and password are required' });
+            return res.status(400).json({status: 'failed',message: 'Username and password are required' });
         }
 
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({status: 'failed', message: 'User not found' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid password ' + user.password});
+            return res.status(401).json({status: 'failed', message: 'Invalid password ' });
         }
 
         const token = await createAccessToken({ userId: user._id, username: user.username });
@@ -68,11 +68,11 @@ export const sign_in = async (req,res,next)=>{
         await user.save();
         //Sets cookies
         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
-        res.status(200).json({ message: 'User signed in successfully' });
+        res.status(200).json({ status: 'success',message: 'User signed in successfully' });
 
     }catch(err){
         console.log('Sign-in error:', err.message);
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ status: 'failed',message: err.message });
     }
 }
 export const sign_out = (req,res,next)=>{
