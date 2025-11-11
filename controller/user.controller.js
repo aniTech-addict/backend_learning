@@ -1,12 +1,11 @@
 import User from '../models/user.model.js';
-import { JWT_ACCESS_SECRET } from '../config/env.js';
+import { JWT_ACCESS_SECRET } from '../config/env.js';   
 import jwt from 'jsonwebtoken';
 async function getUsers(req,res){
     const token = req.cookies.token;
     const user = await User.findOne();
     res.status(200).json(user);
 }
-
 
 
 async function getUser(req,res){
