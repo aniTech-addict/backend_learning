@@ -33,7 +33,7 @@ userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
-    this.password = encryptPassword(this.password);
+    this.password = await encryptPassword(this.password);
     next();
 })
 const User = mongoose.model('User', userSchema);
