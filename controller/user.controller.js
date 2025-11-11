@@ -10,9 +10,8 @@ async function getUsers(req,res){
 
 
 async function getUser(req,res){
-    let token = req.cookies.token;
-    token = jwt.decode(token, JWT_ACCESS_SECRET);
-    const user = await User.findById(token.userId).select('-password');
+    const userId = req.params.id;
+    const user = await User.findById(userId).select('-password -refreshToken');
     if(!user){
         return res.status(404).json({ message: 'User not found' });
     }

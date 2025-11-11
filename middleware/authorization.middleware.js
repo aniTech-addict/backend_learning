@@ -1,6 +1,9 @@
 import { JWT_ACCESS_SECRET } from '../config/env.js';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+
+// Only checks if the user is logged in
+
 const authorizationMiddleware = async (req,res,next)=>{
     let token = req.cookies.token;
     if(!token){
