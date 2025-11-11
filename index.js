@@ -6,11 +6,14 @@ import subscriptionRouter from './routes/subscription.routes.js';
 import authRouter from './routes/auth.routes.js';
 import connectDb from './DB/connectDb.js';
 import authorizationMiddleware from './middleware/authorization.middleware.js';
+import arcjetMiddleware from './middleware/arcjet.middleware.js';
+import { authorizeAdmin } from './middleware/authorizeAdmin.middleware.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(arcjetMiddleware);
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/subscriptions', subscriptionRouter);
