@@ -1,5 +1,5 @@
 import User from '../models/user.model.js';
-import { JWT_SECRET_KEY } from '../config/env.js';
+import { JWT_ACCESS_SECRET } from '../config/env.js';
 import jwt from 'jsonwebtoken';
 async function getUsers(req,res){
     const token = req.cookies.token;
@@ -7,9 +7,11 @@ async function getUsers(req,res){
     res.status(200).json(user);
 }
 
+
+
 async function getUser(req,res){
     let token = req.cookies.token;
-    token = jwt.decode(token, JWT_SECRET_KEY);
+    token = jwt.decode(token, JWT_ACCESS_SECRET);
     const user = await User.findById(token.userId).select('-password');
     if(!user){
         return res.status(404).json({ message: 'User not found' });
