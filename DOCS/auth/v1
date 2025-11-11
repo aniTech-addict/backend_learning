@@ -1,0 +1,51 @@
+# Authentication Workflow
+
+This document outlines the authentication workflow for the backend learning project.
+
+## API FLOW:
+index.js -> auth router -> authController
+
+---
+a json data containing user credentials is sent to the server on api ("/api/auth/login")
+
+the request is received in the index.js file which uses auth router to redirect the specific route
+
+the auth router has imported utils and controllers to manage the authentication flow.
+
+
+## METHODS defined in **authController**:
+
+1. Sign_up -> handles post req and expects to receive a json data containing user credentials
+`(
+    {
+        "username": "user",
+        "email": "user@example.com",
+        "password": "password123"
+    }
+)`
+
+2. Sign_in -> handles post req and expects to receive a json data containing user credentials
+`(
+    {
+        "email": "user@example.com",
+        "password": "password123"
+    }
+)`
+
+3. Sign_out -> (yet to be implemented) handles get req and logs out the user
+
+### JSON Web Token (JWT) usage in auth
+
+**jwt** is separated into two segments(Access & Refresh token) for better security.
+
+the AccessToken(*short lived*) is stored in the cookie, used to verify the user's identity.
+
+the RefreshToken(*long lived*) is stored in the database, used to generate a new AccessToken when the current one expires
+
+Pros of using separate tokens:
+
+- **Access Token** is short-lived and can be easily revoked.
+
+- **Refresh Token** is long-lived and stored in the database, used to generate a new AccessToken when the current one expires.
+
+

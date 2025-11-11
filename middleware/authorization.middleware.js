@@ -1,4 +1,4 @@
-import { JWT_SECRET_KEY } from '../config/env.js';
+import { JWT_ACCESS_SECRET } from '../config/env.js';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 const authorizationMiddleware = async (req,res,next)=>{
@@ -7,7 +7,7 @@ const authorizationMiddleware = async (req,res,next)=>{
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    token = jwt.decode(token, JWT_SECRET_KEY);
+    token = jwt.decode(token, JWT_ACCESS_SECRET);
     const user = await User.findById(token.userId);
 
     if(!user){

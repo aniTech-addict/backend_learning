@@ -7,5 +7,6 @@ config({
 
 export const { PORT,
      DB_URI,
-     JWT_SECRET_KEY
+     JWT_ACCESS_SECRET,
+     JWT_REFRESH_SECRET,
      } = process.env

@@ -1,0 +1,125 @@
+# Authentication Workflow
+
+This document outlines the authentication workflow for the backend learning project, including API endpoints, request/response formats, and security considerations.
+
+## API Flow
+
+The authentication system follows a structured flow:
+
+1. **Entry Point**: Requests are received at `index.js`
+2. **Routing**: Requests are routed through `auth.routes.js` to appropriate handlers
+3. **Controller Logic**: Business logic is handled in `auth.controller.js`
+4. **Utilities**: Token creation and password encryption are managed in utility modules
+
+### Request Flow Diagram
+```
+Client Request → index.js → auth.routes.js → auth.controller.js → Database/Models
+```
+
+## Authentication Endpoints
+
+### 1. User Registration (Sign Up)
+**Endpoint**: `POST /api/v1/auth/sign_up`
+
+**Description**: Creates a new user account with the provided credentials.
+
+**Request Body**:
+```json
+{
+  "username": "user",
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response**:
+- **Success (201)**: `{"message": "User created successfully"}`
+- **Error (400)**: `{"message": "User already exists"}`
+- **Error (500)**: `{"message": "Internal server error"}`
+
+### 2. User Login (Sign In)
+**Endpoint**: `POST /api/v1/auth/sign_in`
+
+**Description**: Authenticates a user and issues an access token stored in HTTP-only cookies.
+
+**Request Body**:
+```json
+{
+  "username": "user",
+  "password": "password123"
+}
+```
+
+**Response**:
+- **Success (200)**: `{"message": "User signed in successfully"}`
+- **Error (400)**: `{"message": "Username and password are required"}`
+- **Error (401)**: `{"message": "Invalid password"}`
+- **Error (404)**: `{"message": "User not found"}`
+
+### 3. User Logout (Sign Out)
+**Endpoint**: `POST /api/v1/auth/sign_out`
+
+**Description**: Logs out the user by clearing authentication tokens.
+
+**Status**: Not yet implemented.
+
+## JWT Token Management
+
+### Token Architecture
+
+The authentication system uses a dual-token approach for enhanced security:
+
+- **Access Token**: Short-lived (typically 15-30 minutes), stored in HTTP-only cookies
+- **Refresh Token**: Long-lived (days to weeks), stored securely in the database
+
+### Current Implementation
+
+- Only access tokens are currently implemented
+- Tokens are created using `util/createToken.js`
+- Access tokens contain user ID and username
+- Tokens are signed with secrets from environment configuration
+
+### Security Benefits
+
+- **Short-lived Access Tokens**: Minimize exposure if compromised
+- **HTTP-only Cookies**: Prevent client-side JavaScript access
+- **Secure Flag**: Ensures HTTPS transmission
+- **SameSite Protection**: Mitigates CSRF attacks
+
+### Best Practices Implemented
+
+- Environment-based secret management
+- HTTP-only cookie storage
+- Secure and SameSite cookie attributes
+- Proper error handling in token creation
+
+## Error Handling and Edge Cases
+
+### Input Validation
+- Required fields are validated before processing
+- Duplicate user checks prevent registration conflicts
+- Password strength requirements should be implemented
+
+### Database Transactions
+- User registration uses MongoDB transactions for data consistency
+- Automatic rollback on errors prevents partial state
+
+### Security Considerations
+- Passwords are hashed using bcrypt before storage
+- JWT secrets are managed through environment variables
+- Tokens are validated on each protected request
+
+### Performance Optimizations
+- Database queries use indexed fields (username, email)
+- Asynchronous operations prevent blocking
+- Efficient bcrypt comparison for password validation
+
+## Future Enhancements
+
+- Implement refresh token functionality
+- Add password reset capabilities
+- Include rate limiting for authentication endpoints
+- Add comprehensive input sanitization
+- Implement token blacklisting for logout
+
+

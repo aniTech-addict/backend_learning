@@ -51,6 +51,8 @@ export const sign_in = async (req,res,next)=>{
         }
 
         const token = await createAccessToken({ userId: user._id, username: user.username });
+
+        //Sets cookies
         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
         res.status(200).json({ message: 'User signed in successfully' });
 
