@@ -1,7 +1,6 @@
 import mongoose, { startSession } from "mongoose"
 import User from '../models/user.model.js';
-import encryptPassword from '../util/encryptPassword.js';
-import { createAccessToken } from '../util/createToken.js';
+import { createAccessToken, createRefreshToken} from '../util/createToken.js';
 import bcrypt from 'bcrypt';
 
 export const sign_up = async (req, res, next) => {
@@ -18,8 +17,20 @@ export const sign_up = async (req, res, next) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        const hashedPassword = await encryptPassword(password);
-        const newUser = new User({ username, email, password: hashedPassword });
+        const newUser = new User({ username, email, password });
+        const payload = { userId: newUser._id, username: newUser.username };
+        const accessToken = await createAccessToken(payload);
+        const refreshToken = await createRefreshToken(payload);
+
+        //set or update cookies
+        res.cookie(
+            'token',
+             accessToken,
+            { httpOnly: true, secure: true, sameSite: 'strict' }
+            );
+
+        newUser.refreshToken = refreshToken;
+
         await newUser.save({ session });
 
         await session.commitTransaction();

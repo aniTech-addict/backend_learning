@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import encryptPassword from '../util/encryptPassword.js';
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -21,9 +22,20 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 6
+    },
+    refreshToken: {
+        type: String,
+        default: ''
     }
 }, { timestamps: true });
 
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    this.password = encryptPassword(this.password);
+    next();
+})
 const User = mongoose.model('User', userSchema);
 
 export default User;
