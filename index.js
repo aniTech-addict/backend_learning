@@ -1,14 +1,25 @@
 import express from 'express';
+
+//Config
 import { PORT } from './config/env.js';
 import cookieParser from 'cookie-parser';
-import userRouter from './routes/user.routes.js';
-import subscriptionRouter from './routes/subscription.routes.js';
-import authRouter from './routes/auth.routes.js';
 import connectDb from './DB/connectDb.js';
-import authorizationMiddleware from './middleware/authorization.middleware.js';
+
+
+//Security
 import arcjetMiddleware from './middleware/arcjet.middleware.js';
+
+//Authorization
+import authRouter from './routes/auth.routes.js';
+import authorizationMiddleware from './middleware/authorization.middleware.js';
 import { authorizeAdmin } from './middleware/authorizeAdmin.middleware.js';
-import postRouter from './routes/post.routes.js';
+
+//Routers
+import userRouter from './routes/user.routes.js';
+import uploadRouter from './routes/upload.routes.js';
+import subscriptionRouter from './routes/subscription.routes.js';
+
+//apply  arcjet middleware later
 
 const app = express();
 
@@ -22,7 +33,7 @@ app.use('/api/v1/subscriptions', subscriptionRouter);
 
 app.use('/api/v1/auth', authRouter);
 
-app.use('/api/v1/post', postRouter);
+app.use('/api/v1/upload', uploadRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
