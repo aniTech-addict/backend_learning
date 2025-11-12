@@ -9,5 +9,6 @@ export const { PORT,
      DB_URI,
      JWT_ACCESS_SECRET, JWT_REFRESH_SECRET,
      ARCJET_KEY,ARCJET_ENV,
-     EMAIL_PASSWORD
+     EMAIL_PASSWORD,
+     CLOUDINARY_API_KEY
      } = process.env
