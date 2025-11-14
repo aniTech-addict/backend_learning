@@ -13,11 +13,6 @@ const storage = (folderPath) =>
     }
   });
 
-module.exports = {
-  getUploader: (folderPath) => multer({ storage: storage(folderPath) })
-};
-
-
 export default {
   getUploader: (folderPath) => multer({ storage: storage(folderPath) })
 };
