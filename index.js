@@ -27,6 +27,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(arcjetMiddleware);
 
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 app.use('/api/v1/users', userRouter);
 
 app.use('/api/v1/subscriptions', subscriptionRouter);
