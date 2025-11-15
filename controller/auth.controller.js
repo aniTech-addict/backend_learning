@@ -17,6 +17,7 @@ export const sign_up = async (req, res, next) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        
         const newUser = new User({ username, email, password });
         const payload = { userId: newUser._id, username: newUser.username };
         const accessToken = await createAccessToken(payload);
