@@ -18,7 +18,7 @@ import { authorizeAdmin } from './middleware/authorizeAdmin.middleware.js';
 import userRouter from './routes/user.routes.js';
 import uploadRouter from './routes/upload.routes.js';
 import subscriptionRouter from './routes/subscription.routes.js';
-
+import logRouter from './routes/log.routes.js';
 //apply  arcjet middleware later
 
 const app = express();
@@ -38,6 +38,7 @@ app.use('/api/v1/auth', authRouter);
 
 app.use('/api/v1/upload', uploadRouter);
 
+app.use('api/v1/log', authorizationMiddleware, authorizeAdmin, logRouter);
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
