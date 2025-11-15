@@ -2,12 +2,13 @@ import mongoose, { startSession } from "mongoose"
 import User from '../models/user.model.js';
 import { createAccessToken, createRefreshToken} from '../util/createToken.js';
 import bcrypt from 'bcrypt';
+import generateOtp from '../util/otpManager.js';
+import { response } from "express";
 
 export const sign_up = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-
-    try {
+     try {
         const { username, email, password } = req.body;
         const existingUser = await User.findOne({
             $or: [{ username }, { email }]
@@ -16,10 +17,38 @@ export const sign_up = async (req, res, next) => {
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
-
-        
         const newUser = new User({ username, email, password });
-        const payload = { userId: newUser._id, username: newUser.username };
+        await generateOtp(newUser._id);
+        await newUser.save({ session });
+
+        await session.commitTransaction();
+        
+        return res.status(201).json({ status: 'success', message: 'redirect to otp verification' ,userId: newUser._id});  // in frontend localStorage.setItem('userId', newUser._id)
+     } catch (error) {
+        console.log("Error in sign up:", error);
+        response.status(500).json({ message: 'Internal server error at sign up' });
+     } finally {
+        session.endSession();
+     }
+        
+}
+
+export const verify_otp= async(req, res)=>{
+    const { otp, userId } = req.body;
+    
+    const validOtp = await verifyOtp(userId, otp);
+
+    if (!validOtp) {
+        return res.status(401).json({success: false, message: 'Invalid OTP' });
+    }
+
+    const user = await User.findById(userId);
+    
+    try {
+        const session = await mongoose.startSession();
+        user.verified = true;
+        user.otp = null;
+        const payload = { userId: user._id, username: user.username };
         const accessToken = await createAccessToken(payload);
         const refreshToken = await createRefreshToken(payload);
 
@@ -30,12 +59,14 @@ export const sign_up = async (req, res, next) => {
             { httpOnly: true, secure: true, sameSite: 'strict' }
             );
 
-        newUser.refreshToken = refreshToken;
+        user.refreshToken = refreshToken;
 
-        await newUser.save({ session });
+        await user.save({ session });
 
         await session.commitTransaction();
-        res.status(201).json({ message: 'User created successfully' });
+
+        return res.status(200).json({ status: 'success', message: 'OTP verified successfully' });
+        
     } catch (err) {
         await session.abortTransaction();
         console.log(err);
@@ -43,6 +74,7 @@ export const sign_up = async (req, res, next) => {
     } finally {
         session.endSession();
     }
+
 }
 
 export const sign_in = async (req,res,next)=>{
@@ -69,7 +101,7 @@ export const sign_in = async (req,res,next)=>{
         await user.save();
         //Sets cookies
         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
-        res.status(200).json({ status: 'success',message: 'User signed in successfully' });
+        res.status(200).json({ status: 'success', message: 'User signed in successfully', userId: user._id });
 
     }catch(err){
         console.log('Sign-in error:', err.message);

@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 import encryptPassword from '../util/encryptPassword.js';
+import Otp from '../models/otp.model.js';
 
 const userSchema = new mongoose.Schema({
 
     username :{
-       type: String,
+        type: String,
+        index: true,
         required: true,
         unique: true,
         trim: true,
@@ -40,6 +42,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    otp :{
+         type: mongoose.Schema.Types.ObjectId,
+         ref: 'Otp',
     }
 },{timestamps:true})
 
