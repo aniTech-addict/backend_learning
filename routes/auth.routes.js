@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sign_in, sign_out, sign_up, verifyOtp } from '../controller/auth.controller.js';
+import { sign_in, sign_out, sign_up, otp_verification } from '../controller/auth.controller.js';
 
 const authRouter = Router();
 
@@ -9,6 +9,6 @@ authRouter.post('/sign_in', sign_in);
 
 authRouter.post('/sign_out', sign_out);
 
-authRouter.post('/verify_otp', verifyOtp);
+authRouter.post('/verify_otp', otp_verification);
 
 export default authRouter;

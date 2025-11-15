@@ -33,7 +33,7 @@ export const sign_up = async (req, res, next) => {
         
 }
 
-export const verify_otp= async(req, res)=>{
+export const otp_verification = async(req, res)=>{
     const { otp, userId } = req.body;
     
     const validOtp = await verifyOtp(userId, otp);
