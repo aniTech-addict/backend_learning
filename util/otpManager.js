@@ -9,24 +9,22 @@ async function sendOtp(otp,email){
 async function generateOtp(userId, email){
     // console.log("User id ",userId)
     const otp = Math.floor(10031 + Math.random()* 87537);
-    const newOtp = new Otp({userId, otp});
+    const newOtp = new Otp({otp});
     sendOtp(otp, email)
     await newOtp.save();
     return await newOtp._id
 }
 
-async function verifyOtp(otpId, otp){
+async function verifyOtp(userId, otp){
     console.log("reached here")
-    const existingOtp = await Otp.findOne({_id: otpId,otp});
+    const existingOtp = await User.findOne({userId});
     if (!existingOtp) {
         console.log("OTP not found");
-        console.log(otpId)
         return false;
     }
     if (existingOtp.otp !== otp) {
         return false;
     }
-    await Otp.deleteOne(otpId)
     return true
 }
 
