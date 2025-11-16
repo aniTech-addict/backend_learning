@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import upload from '../middleware/multer.middleware.js';
-import uploadAvatar from '../controller/user.controller.js';
+import { uploadAvatar } from '../controller/user.controller.js';
 // Posts
 import { uploadPost } from '../controller/post.controller.js';
+import multerCore from '../services/upload/multerCore.service.js';
+
+const upload = multerCore.getUploader('uploads/posts/images');
 
 const uploadRouter = Router();
 
