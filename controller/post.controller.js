@@ -1,36 +1,33 @@
+import upload from '../config/multer.config.js';
+import { uploadToCloudinary } from '../services/upload/cloudinaryUpload.service.js';
 import Post from '../models/post.model.js';
 
-async function uploadPost(req, res) {
-    try {
-        // Validate required fields
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
-        }
+const createPost = async (req, res) => {
+  try {
+    const uploadMiddleware = upload.single('image'); // or .array() for multiple
 
-        if (!req.body.collectionId) {
-            return res.status(400).json({ error: 'Collection ID required' });
-        }
+    uploadMiddleware(req, res, async (err) => {
+      if (err) return res.status(400).json({ error: err.message });
 
-        // Create post with file path
-        const newPost = new Post({
-            collectionId: req.body.collectionId,
-            image_source: req.file.path,
-            description: req.body.description || ''
-        });
+      if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-        await newPost.save();
+      const { url, public_id } = await uploadToCloudinary(req.file.path);
 
-        res.status(201).json({
-            message: 'Post created successfully',
-            data: newPost
-        });
+      const post = await Post.create({
+        imageUrl: url,
+        cloudinaryId: public_id,
+        author: req.user.id,
+      });
 
-    } catch (error) {
-        console.error('Upload error:', error);
-        res.status(500).json({ error: 'Upload failed' });
-    }
-}
+      res.status(201).json(post);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 
 export {
-    uploadPost,
-};
+    createPost,
+    
+}
