@@ -7,10 +7,10 @@ const arcjetMiddleware = async (req, res, next) => {
     console.log("Arcjet decision:", decision);
 
     if (decision.isDenied()) {
-      if (decision.reason === "ArcjetBotReason") {
+      if (decision.reason === "BOT") {  // fix later to -> decision.reason.type
         return res.status(403).json({ message: "Bot detected" });
       }
-      if (decision.reason === "RATE_LIMIT") {
+      if (decision.reason.type === "RATE_LIMIT") {
         return res.status(429).json({ message: "Rate limit exceeded" });
       }
     }
