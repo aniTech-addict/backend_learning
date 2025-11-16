@@ -7,6 +7,10 @@ const otpSchema = new Schema({
         ref: 'User',
         required: true
     },
+    otp:{
+        type: String,
+        required: true
+    },
     createdAt:{
         type: Date,
         default: Date.now,

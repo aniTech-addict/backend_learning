@@ -2,9 +2,8 @@ import mongoose, { startSession } from "mongoose"
 import User from '../models/user.model.js';
 import { createAccessToken, createRefreshToken} from '../util/createToken.js';
 import bcrypt from 'bcrypt';
-import generateOtp from '../util/otpManager.js';
-import { response } from "express";
-
+import { generateOtp } from '../util/otpManager.js';
+import { verifyOtp } from "../util/otpManager.js";
 export const sign_up = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -18,7 +17,9 @@ export const sign_up = async (req, res, next) => {
             return res.status(400).json({ message: 'User already exists' });
         }
         const newUser = new User({ username, email, password });
-        await generateOtp(newUser._id);
+
+        const otpId = await generateOtp(newUser._id, newUser.email);
+        newUser.otp = otpId;
         await newUser.save({ session });
 
         await session.commitTransaction();
@@ -26,7 +27,7 @@ export const sign_up = async (req, res, next) => {
         return res.status(201).json({ status: 'success', message: 'redirect to otp verification' ,userId: newUser._id});  // in frontend localStorage.setItem('userId', newUser._id)
      } catch (error) {
         console.log("Error in sign up:", error);
-        response.status(500).json({ message: 'Internal server error at sign up' });
+        res.status(500).json({ message: 'Internal server error at sign up' });
      } finally {
         session.endSession();
      }
