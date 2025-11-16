@@ -9,6 +9,15 @@ export const sign_up = async (req, res, next) => {
     session.startTransaction();
      try {
         const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: 'Username, email, and password are required' });
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
         const existingUser = await User.findOne({
             $or: [{ username }, { email }]
         });
@@ -18,7 +27,7 @@ export const sign_up = async (req, res, next) => {
         }
         const newUser = new User({ username, email, password });
 
-        const otpId = await generateOtp(newUser._id, newUser.email);
+        const otpId = await generateOtp(email);
         newUser.otp = otpId;
         await newUser.save({ session });
 
@@ -36,7 +45,7 @@ export const sign_up = async (req, res, next) => {
 
 export const otp_verification = async(req, res)=>{
     const { otp, userId } = req.body;
-    
+
     const validOtp = await verifyOtp(userId, otp);
 
     if (!validOtp) {
@@ -44,9 +53,10 @@ export const otp_verification = async(req, res)=>{
     }
 
     const user = await User.findById(userId);
-    
+    const session = await mongoose.startSession();
+
     try {
-        const session = await mongoose.startSession();
+        session.startTransaction();
         user.verified = true;
         user.otp = null;
         const payload = { userId: user._id, username: user.username };
