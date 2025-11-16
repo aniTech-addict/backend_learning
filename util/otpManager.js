@@ -16,9 +16,7 @@ async function generateOtp(email){
 }
 
 async function verifyOtp(userId, otp){
-    console.log("reached here")
     const user = await User.findById(userId).populate('otp');
-    console.log("user", user)
     if (!user || !user.otp) {
         console.log("OTP not found");
         return false;
