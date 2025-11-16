@@ -6,12 +6,17 @@ if(!DB_URI) throw new Error('DB_URI is not defined');
 
 async function connectDb(){
     try {
-        await mongoose.connect(DB_URI);
-        console.log('Connected to MongoDB');
+        const conn = await mongoose.connect(DB_URI);
+        
+        mongoose.connection.on('connected', () => {
+            console.log(`MongoDB connected: ${conn.connection.host}`);
+        });
+        mongoose.connection.on('error', (err) => {
+            console.error('MongoDB connection error:', err);
+        });
     } catch (error) {
-        console.error(error);
-        process.exit(1);
-    }    
+        console.log("Error connecting to db",err )
+    }
 }
 
 export default connectDb;
