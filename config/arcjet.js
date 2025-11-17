@@ -6,7 +6,7 @@ const aj = arcjet({
   rules: [
     shield({ mode: "LIVE" }),
     detectBot({
-      mode: "LIVE", 
+      mode: "LIVE",
       allow: [
         "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc
       ],

@@ -16,5 +16,11 @@ const otpSchema = new Schema({
     }
 },{timestamps: true})
 
+otpSchema.pre('save', function(next) {
+    if(!this.isModified('otp')) return next();
+    this.otp = bcrypt.hashSync(this.otp, 10);
+    next();
+});
+
 const Otp = mongoose.models.Otp || mongoose.model('Otp', otpSchema) 
 export default Otp

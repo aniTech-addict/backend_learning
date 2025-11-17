@@ -1,4 +1,4 @@
-import multer from "multer";
+import multer from 'multer';
 import path from "path";
 
 const storage = (folderPath) =>
@@ -13,6 +13,13 @@ const storage = (folderPath) =>
     }
   });
 
-export default {
-  getUploader: (folderPath) => multer({ storage: storage(folderPath) })
-};
+  const configUploader = (folderPath) => {
+    return multer({
+        storage: storage(folderPath) ,
+        limits: { fileSize: 1024 * 1024 * 5 }, // 5MB
+    });
+  }
+
+export default configUploader;
+
+//upload;

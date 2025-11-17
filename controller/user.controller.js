@@ -1,6 +1,8 @@
 import User from '../models/user.model.js';
-import { JWT_ACCESS_SECRET } from '../config/env.js';   
+import { uploadToCloudinary } from '../services/upload/cloudinaryUpload.service.js';
 import jwt from 'jsonwebtoken';
+import { JWT_ACCESS_SECRET } from '../config/env.js';
+
 async function getUsers(req,res){
     const token = req.cookies.token;
     const user = await User.findOne();
@@ -17,31 +19,35 @@ async function getUser(req,res){
     res.status(200).json({ data: user });
 }
 
-async function uploadAvatar(req, res) {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
+const uploadAvatar = async(req,res) =>{
+    try{
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+        let token = req.cookies.token;
+        if(!token){
+            return res.status(401).json({ success: false, message: 'Unauthorized, User must be Logged in to Upload Avatar' });
         }
-        const userId = req.user._id;
+        
+        const { url } = await uploadToCloudinary(req.file.path, 'avatars');
 
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { avatar: req.file.path },
-            { new: true }
-        ).select('-password -refreshToken');
+        try {
+            const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+            const user = await User.findById(decoded.userId);
 
-        if (!updatedUser) {
-            return res.status(404).json({ error: 'User not found' });
+            if(!user){
+                return res.status(401).json({ success: false, message: 'Unauthorized, No User Found' });
+            }
+
+            user.avatar = url;
+            await user.save();
+
+            res.status(200).json({ success: true, message: 'Avatar updated successfully', user });
+        } catch (error) {
+            return res.status(401).json({ success: false, message: 'Invalid token' });
         }
-
-        res.status(200).json({
-            message: 'Avatar uploaded successfully',
-            data: updatedUser
-        });
-
-    } catch (error) {
-        console.error('Avatar upload error:', error);
-        res.status(500).json({ error: 'Avatar upload failed' });
+    }catch(error){
+        console.error('Upload avatar error:', error);
+        res.status(500).json({ success: false, error: 'Server error: ' + error.message });
     }
 }
 
