@@ -3,6 +3,7 @@ import { createLogs, deleteLogs, updateLogs } from '../controller/log.controller
 
 const logsRouter = Router();
 
+// logsRouter.get('/', getLogs);
 logsRouter.post('/create', createLogs);
 logsRouter.post('/delete', deleteLogs);
 logsRouter.post('/update', updateLogs);

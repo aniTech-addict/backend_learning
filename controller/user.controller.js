@@ -23,31 +23,31 @@ const uploadAvatar = async(req,res) =>{
     try{
         if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-        const { url } = await uploadToCloudinary(req.file.path, 'avatars');
-
         let token = req.cookies.token;
         if(!token){
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ success: false, message: 'Unauthorized, User must be Logged in to Upload Avatar' });
         }
+        
+        const { url } = await uploadToCloudinary(req.file.path, 'avatars');
 
         try {
             const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
             const user = await User.findById(decoded.userId);
 
             if(!user){
-                return res.status(401).json({ message: 'Unauthorized' });
+                return res.status(401).json({ success: false, message: 'Unauthorized, No User Found' });
             }
 
             user.avatar = url;
             await user.save();
 
-            res.status(200).json({ message: 'Avatar updated successfully', user });
+            res.status(200).json({ success: true, message: 'Avatar updated successfully', user });
         } catch (error) {
-            return res.status(401).json({ message: 'Invalid token' });
+            return res.status(401).json({ success: false, message: 'Invalid token' });
         }
     }catch(error){
         console.error('Upload avatar error:', error);
-        res.status(500).json({ error: 'Server error: ' + error.message });
+        res.status(500).json({ success: false, error: 'Server error: ' + error.message });
     }
 }
 

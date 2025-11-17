@@ -2,7 +2,9 @@ import { Router } from 'express';
 import { getUser, getUsers, uploadAvatar } from '../controller/user.controller.js';
 import authorizationMiddleware from '../middleware/authorization.middleware.js';
 import { authorizeAdmin } from '../middleware/authorizeAdmin.middleware.js';
-import upload from '../config/multer.config.js';
+import configUploader from '../config/multer.config.js';
+
+const upload = configUploader('./uploads/avatars/');
 
 const userRouter = Router();
 
